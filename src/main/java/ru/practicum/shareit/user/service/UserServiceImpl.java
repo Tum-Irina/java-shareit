@@ -35,8 +35,13 @@ public class UserServiceImpl implements UserService {
                 userRepository.existsByEmailAndIdNot(userDto.getEmail(), userId)) {
             throw new ConflictException("Email " + userDto.getEmail() + " уже используется другим пользователем");
         }
-        User userToUpdate = UserMapper.toUserUpdate(userDto, existingUser);
-        User updatedUser = userRepository.update(userToUpdate);
+        if (userDto.getName() != null) {
+            existingUser.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            existingUser.setEmail(userDto.getEmail());
+        }
+        User updatedUser = userRepository.save(existingUser);
         return UserMapper.toUserDto(updatedUser);
     }
 
@@ -56,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         findUserOrThrow(userId);
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
     private User findUserOrThrow(Long userId) {
