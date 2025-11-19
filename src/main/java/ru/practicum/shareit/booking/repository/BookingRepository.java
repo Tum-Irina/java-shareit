@@ -33,5 +33,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId AND b.start > :now AND b.status = 'APPROVED' ORDER BY b.start ASC")
     List<Booking> findNextBooking(@Param("itemId") Long itemId, @Param("now") LocalDateTime now);
 
+    @Query("SELECT b FROM Booking b WHERE b.item.id IN :itemIds AND b.end < :now AND b.status = 'APPROVED'")
+    List<Booking> findLastBookingsForItems(@Param("itemIds") List<Long> itemIds, @Param("now") LocalDateTime now);
+
+    @Query("SELECT b FROM Booking b WHERE b.item.id IN :itemIds AND b.start > :now AND b.status = 'APPROVED'")
+    List<Booking> findNextBookingsForItems(@Param("itemIds") List<Long> itemIds, @Param("now") LocalDateTime now);
+
     List<Booking> findByBookerIdAndItemIdAndEndBefore(Long bookerId, Long itemId, LocalDateTime end);
 }

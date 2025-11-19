@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -72,15 +73,28 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemWithBookingsDto> getAllUserItems(Long userId) {
         findUserOrThrow(userId);
         List<Item> items = itemRepository.findAllByOwnerId(userId);
         List<Long> itemIds = items.stream().map(Item::getId).collect(Collectors.toList());
         Map<Long, List<CommentDto>> commentsByItemId = getCommentsByItemIds(itemIds);
-        return itemRepository.findAllByOwnerId(userId).stream()
+        LocalDateTime now = LocalDateTime.now();
+        List<Booking> allLastBookings = bookingRepository.findLastBookingsForItems(itemIds, now);
+        List<Booking> allNextBookings = bookingRepository.findNextBookingsForItems(itemIds, now);
+        Map<Long, Booking> lastBookingMap = allLastBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), booking -> booking));
+        Map<Long, Booking> nextBookingMap = allNextBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), booking -> booking));
+        return items.stream()
                 .map(item -> {
                     ItemWithBookingsDto itemWithBookings = ItemMapper.toItemWithBookingsDto(item);
-                    addBookingInfoToItem(itemWithBookings, item.getId());
+                    if (lastBookingMap.containsKey(item.getId())) {
+                        itemWithBookings.setLastBooking(BookingMapper.toDto(lastBookingMap.get(item.getId())));
+                    }
+                    if (nextBookingMap.containsKey(item.getId())) {
+                        itemWithBookings.setNextBooking(BookingMapper.toDto(nextBookingMap.get(item.getId())));
+                    }
                     itemWithBookings.setComments(commentsByItemId.getOrDefault(item.getId(), List.of()));
                     return itemWithBookings;
                 })
