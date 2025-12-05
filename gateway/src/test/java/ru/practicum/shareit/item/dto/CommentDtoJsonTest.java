@@ -33,14 +33,12 @@ class CommentDtoJsonTest {
 
     @Test
     void testDeserialize() throws Exception {
-        String json = """
-                {
-                    "id": 1,
-                    "text": "Очень полезная вещь",
-                    "authorName": "Alice",
-                    "created": "2024-12-01T10:00:00"
-                }
-                """;
+        String json = "{"
+                + "\"id\": 1,"
+                + "\"text\": \"Очень полезная вещь\","
+                + "\"authorName\": \"Alice\","
+                + "\"created\": \"2024-12-01T10:00:00\""
+                + "}";
 
         CommentDto dto = objectMapper.readValue(json, CommentDto.class);
 
@@ -52,11 +50,9 @@ class CommentDtoJsonTest {
 
     @Test
     void testDeserializeWithoutOptionalFields() throws Exception {
-        String json = """
-                {
-                    "text": "Простой комментарий"
-                }
-                """;
+        String json = "{"
+                + "\"text\": \"Простой комментарий\""
+                + "}";
 
         CommentDto dto = objectMapper.readValue(json, CommentDto.class);
 
