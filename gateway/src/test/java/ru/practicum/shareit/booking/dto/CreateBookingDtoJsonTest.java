@@ -30,12 +30,12 @@ class CreateBookingDtoJsonTest {
     @Test
     void testDeserialize() throws Exception {
         String json = """
-            {
-                "itemId": 1,
-                "start": "2024-12-01T10:00:00",
-                "end": "2024-12-02T10:00:00"
-            }
-            """;
+                {
+                    "itemId": 1,
+                    "start": "2024-12-01T10:00:00",
+                    "end": "2024-12-02T10:00:00"
+                }
+                """;
 
         CreateBookingDto dto = objectMapper.readValue(json, CreateBookingDto.class);
 
@@ -47,12 +47,12 @@ class CreateBookingDtoJsonTest {
     @Test
     void testDeserializeWithNullFields() throws Exception {
         String json = """
-            {
-                "itemId": null,
-                "start": null,
-                "end": null
-            }
-            """;
+                {
+                    "itemId": null,
+                    "start": null,
+                    "end": null
+                }
+                """;
 
         CreateBookingDto dto = objectMapper.readValue(json, CreateBookingDto.class);
 
