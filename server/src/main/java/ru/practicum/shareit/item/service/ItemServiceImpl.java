@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -36,6 +37,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public ItemDto createItem(ItemDto itemDto, Long userId) {
         User owner = findUserOrThrow(userId);
         Item item = ItemMapper.toItem(itemDto);
@@ -48,6 +50,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto updateItem(Long itemId, ItemDto itemDto, Long userId) {
         Item existingItem = findItemOrThrow(itemId);
         checkItemOwnership(existingItem, userId);
@@ -76,7 +79,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ItemWithBookingsDto> getAllUserItems(Long userId) {
         findUserOrThrow(userId);
         List<Item> items = itemRepository.findAllByOwnerId(userId);
@@ -115,6 +117,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteItem(Long itemId, Long userId) {
         Item item = findItemOrThrow(itemId);
         checkItemOwnership(item, userId);
@@ -150,6 +153,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto addComment(Long itemId, CommentDto commentDto, Long userId) {
         Item item = findItemOrThrow(itemId);
         User author = findUserOrThrow(userId);
